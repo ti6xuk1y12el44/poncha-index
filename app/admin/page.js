@@ -87,7 +87,7 @@ export default function AdminPage() {
           <p className="text-stone-500 mt-10">Loading...</p>
         ) : submissions.length === 0 ? (
           <div className="bg-stone-900 border border-stone-800 rounded-2xl p-10 text-center text-stone-500 mt-10">
-            No pending submissions. All caught up!
+            No pending submissions.
           </div>
         ) : (
           <div className="mt-8 space-y-4">
