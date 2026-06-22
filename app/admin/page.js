@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 export default function AdminPage() {
   const [submissions, setSubmissions] = useState([])
   const [loading, setLoading] = useState(true)
+  const [authChecked, setAuthChecked] = useState(false)
 
   async function loadSubmissions() {
     setLoading(true)
@@ -19,17 +20,24 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    loadSubmissions()
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        window.location.href = '/admin/login'
+      } else {
+        setAuthChecked(true)
+        loadSubmissions()
+      }
+    }
+    checkAuth()
   }, [])
 
   async function approve(sub) {
-    // marca a submissão como aprovada
     await supabase
       .from('price_submissions')
       .update({ moderation_status: 'approved' })
       .eq('id', sub.id)
 
-    // atualiza ou cria o preço actual deste venue + tipo de poncha
     await supabase
       .from('price_current')
       .upsert({
@@ -51,10 +59,27 @@ export default function AdminPage() {
     loadSubmissions()
   }
 
+  async function logout() {
+    await supabase.auth.signOut()
+    window.location.href = '/admin/login'
+  }
+
+  if (!authChecked) {
+    return (
+      <main className="min-h-screen bg-stone-950 text-stone-100 flex items-center justify-center">
+        <p className="text-stone-500">Checking access...</p>
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-screen bg-stone-950 text-stone-100 px-6 py-12">
       <div className="max-w-4xl mx-auto">
-        <a href="/" className="text-stone-500 text-sm hover:text-amber-400">← Back to home</a>
+        <div className="flex justify-between items-center">
+          <a href="/" className="text-stone-500 text-sm hover:text-amber-400">← Back to home</a>
+          <button onClick={logout} className="text-stone-500 text-sm hover:text-amber-400">Sign out</button>
+        </div>
+
         <h1 className="text-4xl font-bold mt-4">Admin — pending submissions</h1>
         <p className="text-stone-400 mt-2">Review and approve community price submissions.</p>
 

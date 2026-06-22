@@ -69,8 +69,8 @@ export default function SubmitPage() {
           <p className="text-stone-400 mt-4">
             Your price has been submitted and is awaiting review. Once approved it will appear on the index.
           </p>
-          <a href="/" className="inline-block mt-8 bg-amber-500 text-stone-900 px-8 py-3 rounded-full font-semibold hover:bg-amber-400">
-            Back to home
+          <a href="/" className="text-stone-500 text-sm hover:text-amber-400">
+            ← Back to home
           </a>
         </div>
       </main>
