@@ -33,3 +33,12 @@ body {
 .animate-slow-zoom {
   animation: slowZoom 20s ease-out forwards;
 }
+/* Scroll suave entre secções */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Transições suaves em links e botões */
+a, button {
+  transition: all 0.2s ease;
+}

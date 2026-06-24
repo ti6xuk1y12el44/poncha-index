@@ -112,7 +112,7 @@ export default async function Home() {
         {venues?.length ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10">
             {venues.map(v => (
-              <a key={v.id} href={'/venues/' + v.slug} className="group bg-white rounded-3xl p-6 border border-emerald-100 hover:shadow-xl hover:-translate-y-1 transition">
+              <a key={v.id} href={'/venues/' + v.slug} className="group bg-white rounded-3xl p-6 border border-emerald-100 hover:shadow-xl hover:-translate-y-1 hover:border-amber-300 transition duration-300">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-2xl">🍹</div>
                 <h3 className="font-bold text-lg mt-4 text-emerald-950 group-hover:text-emerald-700 transition">{v.name}</h3>
                 <p className="text-emerald-800/60 text-sm mt-1">📍 {v.municipality}</p>
