@@ -11,12 +11,16 @@ export default function AdminPage() {
 
   async function loadSubmissions() {
     setLoading(true)
-    const { data } = await supabase
-      .from('price_submissions')
-      .select('*, venues(name), poncha_types(name)')
-      .eq('moderation_status', 'pending')
-      .order('created_at', { ascending: false })
-    setSubmissions(data || [])
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch('/api/pending', {
+      headers: { 'Authorization': 'Bearer ' + session.access_token },
+    })
+    if (res.ok) {
+      const json = await res.json()
+      setSubmissions(json.submissions || [])
+    } else {
+      setSubmissions([])
+    }
     setLoading(false)
   }
 
@@ -34,29 +38,38 @@ export default function AdminPage() {
   }, [])
 
   async function approve(sub) {
-    await supabase
-      .from('price_submissions')
-      .update({ moderation_status: 'approved' })
-      .eq('id', sub.id)
-
-    await supabase
-      .from('price_current')
-      .upsert({
-        venue_id: sub.venue_id,
-        poncha_type_id: sub.poncha_type_id,
-        submission_id: sub.id,
-        price_eur: sub.price_eur,
-        verified_at: new Date().toISOString(),
-      })
-
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch('/api/approve', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token,
+      },
+      body: JSON.stringify(sub),
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      alert('Error: ' + err.error)
+      return
+    }
     loadSubmissions()
   }
 
   async function reject(sub) {
-    await supabase
-      .from('price_submissions')
-      .update({ moderation_status: 'rejected' })
-      .eq('id', sub.id)
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch('/api/reject', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token,
+      },
+      body: JSON.stringify(sub),
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      alert('Error: ' + err.error)
+      return
+    }
     loadSubmissions()
   }
 
@@ -90,7 +103,7 @@ export default function AdminPage() {
           <p className="text-emerald-800/50 mt-10">Loading...</p>
         ) : submissions.length === 0 ? (
           <div className="bg-white rounded-3xl p-10 text-center text-emerald-800/50 mt-10 border border-emerald-100">
-            No pending submissions.
+            No pending submissions. All caught up! 🍹
           </div>
         ) : (
           <div className="mt-8 space-y-4">
