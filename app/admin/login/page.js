@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase'
 import Navbar from '../../components/Navbar'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -13,10 +13,21 @@ export default function LoginPage() {
   async function handleLogin() {
     setLoading(true)
     setError('')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+    // Traduz o username para o email real
+    if (username.trim().toLowerCase() !== process.env.NEXT_PUBLIC_ADMIN_USERNAME) {
+      setError('Invalid username or password.')
+      setLoading(false)
+      return
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+      password,
+    })
     setLoading(false)
     if (error) {
-      setError(error.message)
+      setError('Invalid username or password.')
     } else {
       window.location.href = '/admin'
     }
@@ -34,7 +45,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 space-y-4">
-            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#fdfbf3] border border-emerald-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" />
+            <input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} className="w-full bg-[#fdfbf3] border border-emerald-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" />
             <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-[#fdfbf3] border border-emerald-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" />
             {error && <p className="text-rose-600 text-sm">{error}</p>}
             <button onClick={handleLogin} disabled={loading} className="w-full bg-amber-400 text-emerald-950 py-3 rounded-full font-bold hover:bg-amber-300 transition disabled:opacity-50">
