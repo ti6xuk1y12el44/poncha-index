@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import Navbar from '../components/Navbar'
 
 export default function AdminPage() {
   const [submissions, setSubmissions] = useState([])
@@ -66,47 +67,49 @@ export default function AdminPage() {
 
   if (!authChecked) {
     return (
-      <main className="min-h-screen bg-stone-950 text-stone-100 flex items-center justify-center">
-        <p className="text-stone-500">Checking access...</p>
+      <main className="min-h-screen bg-[#fdfbf3] text-emerald-950 flex items-center justify-center">
+        <p className="text-emerald-800/50">Checking access...</p>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-stone-950 text-stone-100 px-6 py-12">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-[#fdfbf3] text-emerald-950">
+      <Navbar solid={true} />
+
+      <section className="px-6 md:px-12 max-w-4xl mx-auto pt-32 pb-20">
         <div className="flex justify-between items-center">
-          <a href="/" className="text-stone-500 text-sm hover:text-amber-400">← Back to home</a>
-          <button onClick={logout} className="text-stone-500 text-sm hover:text-amber-400">Sign out</button>
+          <a href="/" className="text-emerald-700 text-sm font-semibold hover:text-emerald-900">← Back to home</a>
+          <button onClick={logout} className="text-emerald-700 text-sm font-semibold hover:text-emerald-900">Sign out</button>
         </div>
 
-        <h1 className="text-4xl font-bold mt-4">Admin — pending submissions</h1>
-        <p className="text-stone-400 mt-2">Review and approve community price submissions.</p>
+        <h1 className="text-4xl font-black mt-4">Pending submissions</h1>
+        <p className="text-emerald-800/70 mt-2">Review and approve community price submissions.</p>
 
         {loading ? (
-          <p className="text-stone-500 mt-10">Loading...</p>
+          <p className="text-emerald-800/50 mt-10">Loading...</p>
         ) : submissions.length === 0 ? (
-          <div className="bg-stone-900 border border-stone-800 rounded-2xl p-10 text-center text-stone-500 mt-10">
-            No pending submissions.
+          <div className="bg-white rounded-3xl p-10 text-center text-emerald-800/50 mt-10 border border-emerald-100">
+            No pending submissions. All caught up! 🍹
           </div>
         ) : (
           <div className="mt-8 space-y-4">
             {submissions.map(sub => (
-              <div key={sub.id} className="bg-stone-900 border border-stone-800 rounded-2xl p-6 flex justify-between items-center">
+              <div key={sub.id} className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-sm flex justify-between items-center">
                 <div>
-                  <h3 className="font-semibold text-lg">{sub.venues?.name}</h3>
-                  <p className="text-stone-400 text-sm">
-                    {sub.poncha_types?.name} · <span className="text-amber-400 font-semibold">€{sub.price_eur}</span>
+                  <h3 className="font-bold text-lg text-emerald-950">{sub.venues?.name}</h3>
+                  <p className="text-emerald-800/70 text-sm">
+                    {sub.poncha_types?.name} · <span className="text-emerald-700 font-bold">€{sub.price_eur}</span>
                   </p>
-                  <p className="text-stone-500 text-xs mt-1">
+                  <p className="text-emerald-800/40 text-xs mt-1">
                     By {sub.contributor_name} · observed {sub.observed_at}
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => approve(sub)} className="bg-green-600 hover:bg-green-500 text-white px-5 py-2 rounded-full font-semibold">
+                  <button onClick={() => approve(sub)} className="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-full font-semibold transition">
                     Approve
                   </button>
-                  <button onClick={() => reject(sub)} className="bg-stone-700 hover:bg-stone-600 text-white px-5 py-2 rounded-full font-semibold">
+                  <button onClick={() => reject(sub)} className="bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2 rounded-full font-semibold transition">
                     Reject
                   </button>
                 </div>
@@ -114,7 +117,7 @@ export default function AdminPage() {
             ))}
           </div>
         )}
-      </div>
+      </section>
     </main>
   )
 }

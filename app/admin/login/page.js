@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import Navbar from '../../components/Navbar'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -22,23 +23,27 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-stone-950 text-stone-100 flex items-center justify-center px-6">
-      <div className="w-full max-w-sm">
-        <a href="/" className="text-stone-500 text-sm hover:text-amber-400">
-            ← Back to home
-          </a>
-        <h1 className="text-3xl font-bold text-center">Admin login</h1>
-        <div className="mt-8 space-y-4">
-          <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-stone-900 border border-stone-700 rounded-xl px-4 py-3" />
-          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-stone-900 border border-stone-700 rounded-xl px-4 py-3" />
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-          <button onClick={handleLogin} disabled={loading} className="w-full bg-amber-500 text-stone-900 py-3 rounded-full font-semibold hover:bg-amber-400 disabled:opacity-50">
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
+    <main className="min-h-screen bg-[#fdfbf3] text-emerald-950">
+      <Navbar solid={true} />
+
+      <section className="px-6 flex items-center justify-center min-h-screen">
+        <div className="w-full max-w-sm bg-white rounded-3xl p-8 border border-emerald-100 shadow-sm">
+          <div className="text-center">
+            <div className="text-4xl">🍹</div>
+            <h1 className="text-2xl font-black mt-3">Admin login</h1>
+            <p className="text-emerald-800/60 text-sm mt-1">Sign in to review submissions.</p>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#fdfbf3] border border-emerald-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" />
+            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-[#fdfbf3] border border-emerald-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" />
+            {error && <p className="text-rose-600 text-sm">{error}</p>}
+            <button onClick={handleLogin} disabled={loading} className="w-full bg-amber-400 text-emerald-950 py-3 rounded-full font-bold hover:bg-amber-300 transition disabled:opacity-50">
+              {loading ? 'Signing in...' : 'Sign in'}
+            </button>
+          </div>
         </div>
-      </div>
-      <div>
-      </div>
+      </section>
     </main>
   )
 }
