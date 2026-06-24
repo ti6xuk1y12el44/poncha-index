@@ -2,6 +2,7 @@ import { supabase } from './lib/supabase'
 import Navbar from './components/Navbar'
 import FadeIn from './components/FadeIn'
 import CountUp from './components/CountUp'
+import MunicipalityStats from './components/MunicipalityStats'
 
 export default async function Home() {
   const { data: venues } = await supabase
@@ -97,6 +98,11 @@ export default async function Home() {
           </div>
         )}
       </section>
+      </FadeIn>
+
+      {/* MUNICIPALITY STATS */}
+      <FadeIn delay={100}>
+        <MunicipalityStats />
       </FadeIn>
 
       {/* FOOTER */}

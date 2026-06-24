@@ -30,7 +30,9 @@ export default async function VenuePage({ params }) {
     .eq('moderation_status', 'approved')
     .order('observed_at', { ascending: false })
 
-  const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((venue.address || '') + ' ' + (venue.municipality || ''))
+  const mapsUrl = venue.latitude && venue.longitude
+    ? 'https://www.google.com/maps/search/?api=1&query=' + venue.latitude + ',' + venue.longitude
+    : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((venue.address || '') + ' ' + (venue.municipality || ''))
 
   const prices = current?.map(c => c.price_eur) || []
   const cheapest = prices.length ? Math.min(...prices).toFixed(2) : null
