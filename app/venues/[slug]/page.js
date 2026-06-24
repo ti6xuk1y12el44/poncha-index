@@ -1,5 +1,6 @@
 import { supabase } from '../../lib/supabase'
 import Navbar from '../../components/Navbar'
+import Footer from '../../components/Footer'
 
 export default async function VenuePage({ params }) {
   const { slug } = await params
@@ -108,6 +109,7 @@ export default async function VenuePage({ params }) {
         </div>
 
       </section>
+      <Footer /> 
     </main>
   )
 }

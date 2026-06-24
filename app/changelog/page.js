@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 
 export default async function ChangelogPage() {
   const { data: updates } = await supabase
@@ -41,6 +42,7 @@ export default async function ChangelogPage() {
         )}
 
       </section>
+      <Footer />
     </main>
   )
 }

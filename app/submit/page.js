@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 
 export default function SubmitPage() {
   const [venues, setVenues] = useState([])
@@ -139,6 +140,7 @@ export default function SubmitPage() {
 
         </div>
       </section>
+      <Footer />
     </main>
   )
 }
