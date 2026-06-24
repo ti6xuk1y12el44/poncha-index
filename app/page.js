@@ -4,6 +4,7 @@ import FadeIn from './components/FadeIn'
 import CountUp from './components/CountUp'
 import MunicipalityStats from './components/MunicipalityStats'
 import VenuesMap from './components/VenuesMap'
+import Footer from './components/Footer'
 
 export default async function Home() {
   const { data: venues } = await supabase
@@ -15,12 +16,10 @@ export default async function Home() {
     .from('price_current')
     .select('price_eur')
 
-  // Preço atual por venue, para o mapa
   const { data: currentPrices } = await supabase
     .from('price_current')
     .select('venue_id, price_eur')
 
-  // Juntar cada venue com o seu preço mais baixo (se tiver)
   const priceByVenue = {}
   for (const p of currentPrices || []) {
     if (priceByVenue[p.venue_id] == null || p.price_eur < priceByVenue[p.venue_id]) {
@@ -134,11 +133,7 @@ export default async function Home() {
         <MunicipalityStats />
       </FadeIn>
 
-      {/* FOOTER */}
-      <footer className="px-6 md:px-12 max-w-6xl mx-auto mt-24 py-10 border-t border-emerald-100 text-center text-emerald-800/60 text-sm">
-        <p>Prices may change — always confirm at the venue. Drink responsibly. You must be 18+ to consume alcohol in Portugal.</p>
-        <p className="mt-2 font-semibold text-emerald-800/80">Poncha Index · Madeira Friends Tech Lab · 2026</p>
-      </footer>
+      <Footer />
 
     </main>
   )
