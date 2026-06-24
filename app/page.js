@@ -1,5 +1,7 @@
 import { supabase } from './lib/supabase'
 import Navbar from './components/Navbar'
+import FadeIn from './components/FadeIn'
+import CountUp from './components/CountUp'
 
 export default async function Home() {
   const { data: venues } = await supabase
@@ -12,9 +14,9 @@ export default async function Home() {
     .select('price_eur')
 
   const prices = stats?.map(s => s.price_eur) || []
-  const avgPrice = prices.length ? (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2) : null
-  const minPrice = prices.length ? Math.min(...prices).toFixed(2) : null
-  const maxPrice = prices.length ? Math.max(...prices).toFixed(2) : null
+  const avgPrice = prices.length ? (prices.reduce((a, b) => a + b, 0) / prices.length) : null
+  const minPrice = prices.length ? Math.min(...prices) : null
+  const maxPrice = prices.length ? Math.max(...prices) : null
 
   return (
     <main className="min-h-screen bg-[#fdfbf3] text-emerald-950">
@@ -26,7 +28,7 @@ export default async function Home() {
         <img
           src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&q=80"
           alt="Madeira landscape"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover animate-slow-zoom"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/90 via-emerald-900/60 to-transparent" />
         <div className="relative px-6 md:px-12 max-w-6xl mx-auto w-full">
@@ -41,7 +43,9 @@ export default async function Home() {
           <div className="mt-10 flex flex-wrap items-end gap-10">
             <div>
               <p className="text-amber-300 text-xs uppercase tracking-widest">Island average</p>
-              <p className="text-white text-6xl md:text-7xl font-black mt-1">{avgPrice ? '€' + avgPrice : '€—'}</p>
+              <p className="text-white text-6xl md:text-7xl font-black mt-1">
+                {avgPrice ? <CountUp end={avgPrice} prefix="€" decimals={2} /> : '€—'}
+              </p>
             </div>
             <p className="text-emerald-100 mb-2">
               <span className="font-bold text-white">{stats?.length || 0}</span> verified prices<br/>
@@ -56,14 +60,17 @@ export default async function Home() {
       </section>
 
       {/* STAT CARDS */}
+      <FadeIn>
       <section className="px-6 md:px-12 max-w-6xl mx-auto -mt-12 relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Venues tracked" value={venues?.length || 0} />
-        <StatCard label="Verified prices" value={stats?.length || 0} />
-        <StatCard label="Cheapest" value={minPrice ? '€' + minPrice : '—'} accent="text-emerald-600" />
-        <StatCard label="Priciest" value={maxPrice ? '€' + maxPrice : '—'} accent="text-rose-600" />
+        <StatCard label="Venues tracked" value={<CountUp end={venues?.length || 0} />} />
+        <StatCard label="Verified prices" value={<CountUp end={stats?.length || 0} />} />
+        <StatCard label="Cheapest" value={minPrice ? <CountUp end={minPrice} prefix="€" decimals={2} /> : '—'} accent="text-emerald-600" />
+        <StatCard label="Priciest" value={maxPrice ? <CountUp end={maxPrice} prefix="€" decimals={2} /> : '—'} accent="text-rose-600" />
       </section>
+      </FadeIn>
 
       {/* VENUES */}
+      <FadeIn delay={100}>
       <section className="px-6 md:px-12 max-w-6xl mx-auto mt-20">
         <div className="flex items-end justify-between">
           <div>
@@ -90,6 +97,7 @@ export default async function Home() {
           </div>
         )}
       </section>
+      </FadeIn>
 
       {/* FOOTER */}
       <footer className="px-6 md:px-12 max-w-6xl mx-auto mt-24 py-10 border-t border-emerald-100 text-center text-emerald-800/60 text-sm">
