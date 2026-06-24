@@ -3,6 +3,7 @@ import Navbar from './components/Navbar'
 import FadeIn from './components/FadeIn'
 import CountUp from './components/CountUp'
 import MunicipalityStats from './components/MunicipalityStats'
+import VenuesMap from './components/VenuesMap'
 
 export default async function Home() {
   const { data: venues } = await supabase
@@ -13,6 +14,23 @@ export default async function Home() {
   const { data: stats } = await supabase
     .from('price_current')
     .select('price_eur')
+
+  // Preço atual por venue, para o mapa
+  const { data: currentPrices } = await supabase
+    .from('price_current')
+    .select('venue_id, price_eur')
+
+  // Juntar cada venue com o seu preço mais baixo (se tiver)
+  const priceByVenue = {}
+  for (const p of currentPrices || []) {
+    if (priceByVenue[p.venue_id] == null || p.price_eur < priceByVenue[p.venue_id]) {
+      priceByVenue[p.venue_id] = p.price_eur
+    }
+  }
+  const venuesWithPrice = (venues || []).map(v => ({
+    ...v,
+    price: priceByVenue[v.id] ?? null,
+  }))
 
   const prices = stats?.map(s => s.price_eur) || []
   const avgPrice = prices.length ? (prices.reduce((a, b) => a + b, 0) / prices.length) : null
@@ -67,6 +85,17 @@ export default async function Home() {
         <StatCard label="Verified prices" value={<CountUp end={stats?.length || 0} />} />
         <StatCard label="Cheapest" value={minPrice ? <CountUp end={minPrice} prefix="€" decimals={2} /> : '—'} accent="text-emerald-600" />
         <StatCard label="Priciest" value={maxPrice ? <CountUp end={maxPrice} prefix="€" decimals={2} /> : '—'} accent="text-rose-600" />
+      </section>
+      </FadeIn>
+
+      {/* MAP */}
+      <FadeIn>
+      <section className="px-6 md:px-12 max-w-6xl mx-auto mt-20">
+        <h2 className="text-3xl md:text-4xl font-black text-emerald-950">Poncha across the island</h2>
+        <p className="text-emerald-800/70 mt-1">Green is cheaper, red is pricier. Click a point for details.</p>
+        <div className="mt-8">
+          <VenuesMap venues={venuesWithPrice} />
+        </div>
       </section>
       </FadeIn>
 
