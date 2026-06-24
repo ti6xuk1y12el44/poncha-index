@@ -90,7 +90,7 @@ export default function AdminPage() {
           <p className="text-emerald-800/50 mt-10">Loading...</p>
         ) : submissions.length === 0 ? (
           <div className="bg-white rounded-3xl p-10 text-center text-emerald-800/50 mt-10 border border-emerald-100">
-            No pending submissions. All caught up! 🍹
+            No pending submissions.
           </div>
         ) : (
           <div className="mt-8 space-y-4">

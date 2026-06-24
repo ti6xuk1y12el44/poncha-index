@@ -29,7 +29,6 @@ export default function LoginPage() {
       <section className="px-6 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-sm bg-white rounded-3xl p-8 border border-emerald-100 shadow-sm">
           <div className="text-center">
-            <div className="text-4xl">🍹</div>
             <h1 className="text-2xl font-black mt-3">Admin login</h1>
             <p className="text-emerald-800/60 text-sm mt-1">Sign in to review submissions.</p>
           </div>
