@@ -67,7 +67,6 @@ export default function SubmitPage() {
     return (
       <main className="min-h-screen bg-[#fdfbf3] text-emerald-950 flex items-center justify-center px-6">
         <div className="text-center max-w-md bg-white rounded-3xl p-10 border border-emerald-100 shadow-sm">
-          <div className="text-5xl">🍹</div>
           <h1 className="text-3xl font-black text-emerald-800 mt-4">Thank you!</h1>
           <p className="text-emerald-800/70 mt-3">
             Your price has been submitted and is awaiting review. Once approved it will appear on the index.
