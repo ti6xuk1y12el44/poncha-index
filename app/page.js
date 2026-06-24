@@ -1,5 +1,5 @@
 import { supabase } from './lib/supabase'
-
+// before visual redesign
 export default async function Home() {
   const { data: venues } = await supabase
     .from('venues')
