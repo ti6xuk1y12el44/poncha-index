@@ -41,8 +41,8 @@ export default async function Home() {
 
       <Navbar />
 
-      {/* HERO */}
-      <section className="relative h-[85vh] flex items-center overflow-hidden">
+{/* HERO */}
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden pt-28 pb-16">
         <img
           src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&q=80"
           alt="Madeira landscape"
