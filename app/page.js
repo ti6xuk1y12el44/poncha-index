@@ -32,17 +32,20 @@ export default async function Home() {
     price: priceByVenue[v.id] ?? null,
   }))
 
+  // Encontrar o venue mais barato e mais caro
+  const venuesWithRealPrice = venuesWithPrice.filter(v => v.price !== null)
+  const cheapestVenue = venuesWithRealPrice.length ? venuesWithRealPrice.reduce((a, b) => a.price < b.price ? a : b) : null
+  const priciestVenue = venuesWithRealPrice.length ? venuesWithRealPrice.reduce((a, b) => a.price > b.price ? a : b) : null
+
   const prices = stats?.map(s => s.price_eur) || []
   const avgPrice = prices.length ? (prices.reduce((a, b) => a + b, 0) / prices.length) : null
-  const minPrice = prices.length ? Math.min(...prices) : null
-  const maxPrice = prices.length ? Math.max(...prices) : null
 
   return (
     <main className="min-h-screen bg-[#fdfbf3] text-emerald-950">
 
       <Navbar />
 
-{/* HERO */}
+      {/* HERO */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden pt-28 pb-16">
         <img
           src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&q=80"
@@ -51,7 +54,6 @@ export default async function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/90 via-emerald-900/60 to-transparent" />
         <div className="relative px-6 md:px-12 max-w-6xl mx-auto w-full">
-          <p className="uppercase tracking-[0.2em] text-amber-300 text-sm font-semibold">Madeira's traditional drink</p>
           <h1 className="text-white text-5xl md:text-8xl font-black mt-4 leading-none">
             The Poncha<br/>Index
           </h1>
@@ -83,8 +85,18 @@ export default async function Home() {
       <section className="px-6 md:px-12 max-w-6xl mx-auto -mt-12 relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Venues tracked" value={<CountUp end={venues?.length || 0} />} />
         <StatCard label="Verified prices" value={<CountUp end={stats?.length || 0} />} />
-        <StatCard label="Cheapest" value={minPrice ? <CountUp end={minPrice} prefix="€" decimals={2} /> : '—'} accent="text-emerald-600" />
-        <StatCard label="Priciest" value={maxPrice ? <CountUp end={maxPrice} prefix="€" decimals={2} /> : '—'} accent="text-rose-600" />
+        <StatCard
+          label={cheapestVenue ? cheapestVenue.name : 'Cheapest'}
+          value={cheapestVenue ? <CountUp end={cheapestVenue.price} prefix="€" decimals={2} /> : '—'}
+          accent="text-emerald-600"
+          sublabel="Cheapest"
+        />
+        <StatCard
+          label={priciestVenue ? priciestVenue.name : 'Priciest'}
+          value={priciestVenue ? <CountUp end={priciestVenue.price} prefix="€" decimals={2} /> : '—'}
+          accent="text-rose-600"
+          sublabel="Priciest"
+        />
       </section>
       </FadeIn>
 
@@ -99,7 +111,6 @@ export default async function Home() {
       </section>
       </FadeIn>
 
-      {/* VENUES */}
       <FadeIn delay={100}>
       <section className="px-6 md:px-12 max-w-6xl mx-auto mt-20">
         <div className="flex items-end justify-between">
@@ -107,12 +118,12 @@ export default async function Home() {
             <h2 className="text-3xl md:text-4xl font-black text-emerald-950">Where to drink poncha</h2>
             <p className="text-emerald-800/70 mt-1">Venues across Madeira serving the real thing.</p>
           </div>
-          <a href="/venues" className="text-emerald-700 font-semibold hover:text-emerald-900 hidden md:block">See all →</a>
+          <a href="/venues" className="text-emerald-700 font-semibold hover:text-emerald-900">See all venues →</a>
         </div>
 
         {venues?.length ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10">
-            {venues.map(v => (
+            {venues.slice(0, 3).map(v => (
               <a key={v.id} href={'/venues/' + v.slug} className="group bg-white rounded-3xl p-6 border border-emerald-100 hover:shadow-xl hover:-translate-y-1 hover:border-amber-300 transition duration-300">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-2xl">🍹</div>
                 <h3 className="font-bold text-lg mt-4 text-emerald-950 group-hover:text-emerald-700 transition">{v.name}</h3>
@@ -140,11 +151,12 @@ export default async function Home() {
   )
 }
 
-function StatCard({ label, value, accent = 'text-emerald-700' }) {
+function StatCard({ label, value, accent = 'text-emerald-700', sublabel }) {
   return (
     <div className="bg-white rounded-2xl p-6 text-center border border-emerald-100 shadow-sm">
+      {sublabel && <p className="text-emerald-800/40 text-xs uppercase tracking-wider font-medium">{sublabel}</p>}
       <p className={'text-3xl font-black ' + accent}>{value}</p>
-      <p className="text-emerald-800/70 text-xs uppercase tracking-wider mt-2 font-medium">{label}</p>
+      <p className="text-emerald-800/70 text-xs uppercase tracking-wider mt-2 font-medium truncate">{label}</p>
     </div>
   )
 }
