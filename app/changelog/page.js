@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-
+// changelog
 export default async function ChangelogPage() {
   const { data: updates } = await supabase
     .from('price_submissions')
