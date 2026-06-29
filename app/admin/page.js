@@ -99,7 +99,9 @@ export default function AdminPage() {
         <p className="text-[#c9a84c] text-xs uppercase tracking-[0.2em] font-medium mt-8">Admin</p>
         <h1 className="text-4xl font-black mt-2">Pending submissions</h1>
         <p className="text-white/40 mt-2">Review and approve community price submissions.</p>
-
+        <a href="/admin/venues" className="inline-block mt-4 border border-white/10 text-white/50 px-5 py-2 rounded-full text-sm font-semibold hover:bg-white/5 hover:text-white transition">
+          Manage venues →
+        </a>
         {loading ? (
           <p className="text-white/30 mt-10">Loading...</p>
         ) : submissions.length === 0 ? (
