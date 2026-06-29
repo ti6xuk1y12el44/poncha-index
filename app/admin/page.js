@@ -73,6 +73,45 @@ export default function AdminPage() {
     loadSubmissions()
   }
 
+  function downloadCSV(csv, filename) {
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function exportVenues() {
+    const { data } = await supabase.from('venues').select('*').order('name')
+    if (!data || data.length === 0) return alert('No venues to export.')
+    const headers = ['name', 'slug', 'address', 'municipality', 'latitude', 'longitude', 'phone', 'website', 'status']
+    const rows = data.map(v => headers.map(h => '"' + (v[h] || '').toString().replace(/"/g, '""') + '"').join(','))
+    const csv = [headers.join(','), ...rows].join('\n')
+    downloadCSV(csv, 'poncha-venues.csv')
+  }
+
+  async function exportPrices() {
+    const { data } = await supabase
+      .from('price_submissions')
+      .select('*, venues(name), poncha_types(name)')
+      .eq('moderation_status', 'approved')
+      .order('created_at', { ascending: false })
+    if (!data || data.length === 0) return alert('No prices to export.')
+    const rows = data.map(p => [
+      '"' + (p.venues?.name || '') + '"',
+      '"' + (p.poncha_types?.name || '') + '"',
+      p.price_eur,
+      '"' + (p.observed_at || '') + '"',
+      '"' + (p.contributor_name || '') + '"',
+      '"' + (p.source_type || '') + '"',
+      '"' + (p.moderation_status || '') + '"',
+    ].join(','))
+    const csv = ['venue,poncha_type,price_eur,observed_at,contributor,source_type,status', ...rows].join('\n')
+    downloadCSV(csv, 'poncha-prices.csv')
+  }
+
   async function logout() {
     await supabase.auth.signOut()
     window.location.href = '/admin/login'
@@ -99,9 +138,19 @@ export default function AdminPage() {
         <p className="text-[#c9a84c] text-xs uppercase tracking-[0.2em] font-medium mt-8">Admin</p>
         <h1 className="text-4xl font-black mt-2">Pending submissions</h1>
         <p className="text-white/40 mt-2">Review and approve community price submissions.</p>
-        <a href="/admin/venues" className="inline-block mt-4 border border-white/10 text-white/50 px-5 py-2 rounded-full text-sm font-semibold hover:bg-white/5 hover:text-white transition">
-          Manage venues →
-        </a>
+
+        <div className="flex flex-wrap gap-3 mt-4">
+          <a href="/admin/venues" className="border border-white/10 text-white/50 px-5 py-2 rounded-full text-sm font-semibold hover:bg-white/5 hover:text-white transition">
+            Manage venues →
+          </a>
+          <button onClick={exportVenues} className="border border-white/10 text-white/50 px-5 py-2 rounded-full text-sm font-semibold hover:bg-white/5 hover:text-white transition">
+            Export venues CSV
+          </button>
+          <button onClick={exportPrices} className="border border-white/10 text-white/50 px-5 py-2 rounded-full text-sm font-semibold hover:bg-white/5 hover:text-white transition">
+            Export prices CSV
+          </button>
+        </div>
+
         {loading ? (
           <p className="text-white/30 mt-10">Loading...</p>
         ) : submissions.length === 0 ? (
