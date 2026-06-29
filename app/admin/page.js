@@ -80,49 +80,50 @@ export default function AdminPage() {
 
   if (!authChecked) {
     return (
-      <main className="min-h-screen bg-[#fdfbf3] text-emerald-950 flex items-center justify-center">
-        <p className="text-emerald-800/50">Checking access...</p>
+      <main className="min-h-screen bg-[#0a0f0a] text-white flex items-center justify-center">
+        <p className="text-white/30">Checking access...</p>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-[#fdfbf3] text-emerald-950">
+    <main className="min-h-screen bg-[#0a0f0a] text-white">
       <Navbar solid={true} />
 
       <section className="px-6 md:px-12 max-w-4xl mx-auto pt-32 pb-20">
         <div className="flex justify-between items-center">
-          <a href="/" className="text-emerald-700 text-sm font-semibold hover:text-emerald-900">← Back to home</a>
-          <button onClick={logout} className="text-emerald-700 text-sm font-semibold hover:text-emerald-900">Sign out</button>
+          <a href="/" className="text-white/30 text-sm hover:text-white transition">← Back to home</a>
+          <button onClick={logout} className="text-white/30 text-sm hover:text-white transition">Sign out</button>
         </div>
 
-        <h1 className="text-4xl font-black mt-4">Pending submissions</h1>
-        <p className="text-emerald-800/70 mt-2">Review and approve community price submissions.</p>
+        <p className="text-[#c9a84c] text-xs uppercase tracking-[0.2em] font-medium mt-8">Admin</p>
+        <h1 className="text-4xl font-black mt-2">Pending submissions</h1>
+        <p className="text-white/40 mt-2">Review and approve community price submissions.</p>
 
         {loading ? (
-          <p className="text-emerald-800/50 mt-10">Loading...</p>
+          <p className="text-white/30 mt-10">Loading...</p>
         ) : submissions.length === 0 ? (
-          <div className="bg-white rounded-3xl p-10 text-center text-emerald-800/50 mt-10 border border-emerald-100">
-            No pending submissions.
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-10 text-center text-white/30 mt-10">
+            No pending submissions. All clear.
           </div>
         ) : (
-          <div className="mt-8 space-y-4">
+          <div className="mt-8 space-y-3">
             {submissions.map(sub => (
-              <div key={sub.id} className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-sm flex justify-between items-center">
+              <div key={sub.id} className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
-                  <h3 className="font-bold text-lg text-emerald-950">{sub.venues?.name}</h3>
-                  <p className="text-emerald-800/70 text-sm">
-                    {sub.poncha_types?.name} · <span className="text-emerald-700 font-bold">€{sub.price_eur}</span>
+                  <h3 className="font-bold text-lg">{sub.venues?.name}</h3>
+                  <p className="text-white/50 text-sm mt-1">
+                    {sub.poncha_types?.name} · <span className="text-[#c9a84c] font-bold">€{sub.price_eur}</span>
                   </p>
-                  <p className="text-emerald-800/40 text-xs mt-1">
+                  <p className="text-white/20 text-xs mt-1">
                     By {sub.contributor_name} · observed {sub.observed_at}
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  <button onClick={() => approve(sub)} className="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-full font-semibold transition">
+                <div className="flex gap-2 shrink-0">
+                  <button onClick={() => approve(sub)} className="bg-[#c9a84c] text-[#0a0f0a] px-6 py-2.5 rounded-full font-semibold hover:bg-[#d4b65c] transition">
                     Approve
                   </button>
-                  <button onClick={() => reject(sub)} className="bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2 rounded-full font-semibold transition">
+                  <button onClick={() => reject(sub)} className="bg-white/5 text-white/50 px-6 py-2.5 rounded-full font-semibold hover:bg-white/10 hover:text-white transition">
                     Reject
                   </button>
                 </div>
