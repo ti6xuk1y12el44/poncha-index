@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 
 export default function FloatingButton() {
@@ -11,6 +11,9 @@ export default function FloatingButton() {
   const [sent, setSent] = useState(false)
   const [venues, setVenues] = useState([])
   const [photoForm, setPhotoForm] = useState({ venue_id: '', description: '', contributor_name: '' })
+  const [photoFile, setPhotoFile] = useState(null)
+  const [photoPreview, setPhotoPreview] = useState(null)
+  const fileRef = useRef(null)
 
   useEffect(() => {
     async function loadVenues() {
@@ -25,11 +28,24 @@ export default function FloatingButton() {
     setPanel(null)
     setMessage('')
     setPhotoForm({ venue_id: '', description: '', contributor_name: '' })
+    setPhotoFile(null)
+    setPhotoPreview(null)
   }
 
   function closeAll() {
     setOpen(false)
     reset()
+  }
+
+  function handleFileChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Photo must be under 5MB.')
+      return
+    }
+    setPhotoFile(file)
+    setPhotoPreview(URL.createObjectURL(file))
   }
 
   async function sendCorrection() {
@@ -45,13 +61,33 @@ export default function FloatingButton() {
   }
 
   async function sendPhoto() {
-    if (!photoForm.venue_id || !photoForm.description.trim()) return
+    if (!photoForm.venue_id || !photoFile) return
     setSending(true)
+
+    const ext = photoFile.name.split('.').pop()
+    const fileName = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext
+
+    const { error: uploadError } = await supabase.storage
+      .from('photos')
+      .upload(fileName, photoFile)
+
+    if (uploadError) {
+      alert('Upload failed: ' + uploadError.message)
+      setSending(false)
+      return
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('photos')
+      .getPublicUrl(fileName)
+
     await supabase.from('photo_submissions').insert({
       venue_id: photoForm.venue_id,
-      description: photoForm.description.trim(),
+      photo_url: urlData.publicUrl,
+      description: photoForm.description.trim() || null,
       contributor_name: photoForm.contributor_name.trim() || 'Anonymous',
     })
+
     setSending(false)
     setSent(true)
     setTimeout(closeAll, 2000)
@@ -105,7 +141,7 @@ export default function FloatingButton() {
           {sent ? (
             <div className="text-center py-6">
               <p className="text-[#c9a84c] text-2xl font-black">Thank you</p>
-              <p className="text-white/40 text-sm mt-2">Your photo tip has been recorded.</p>
+              <p className="text-white/40 text-sm mt-2">Your photo has been submitted.</p>
             </div>
           ) : (
             <>
@@ -113,7 +149,7 @@ export default function FloatingButton() {
                 <h3 className="font-bold text-white text-sm">Share a photo</h3>
                 <button onClick={reset} className="text-white/30 hover:text-white text-sm">✕</button>
               </div>
-              <p className="text-white/40 text-xs mb-3">Visited a venue? Tell us about it and share your experience.</p>
+
               <select
                 value={photoForm.venue_id}
                 onChange={e => setPhotoForm({ ...photoForm, venue_id: e.target.value })}
@@ -123,30 +159,57 @@ export default function FloatingButton() {
                 {venues.map(v => (
                   <option key={v.id} value={v.id} className="bg-[#141e16] text-white">{v.name}</option>
                 ))}
-                {venues.map(v => (
-                  <option key={v.id} value={v.id}>{v.name}</option>
-                ))}
               </select>
+
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+
+              {photoPreview ? (
+                <div className="relative mb-3">
+                  <img src={photoPreview} alt="Preview" className="w-full h-32 object-cover rounded-xl" />
+                  <button
+                    onClick={() => { setPhotoFile(null); setPhotoPreview(null); }}
+                    className="absolute top-2 right-2 bg-black/60 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center hover:bg-black/80"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  className="w-full border border-dashed border-white/20 rounded-xl py-6 text-center text-white/30 text-sm hover:border-[#c9a84c]/40 hover:text-white/50 transition mb-3"
+                >
+                  Tap to select a photo
+                </button>
+              )}
+
               <textarea
                 value={photoForm.description}
                 onChange={e => setPhotoForm({ ...photoForm, description: e.target.value })}
-                placeholder="Describe your visit or photo..."
-                rows={3}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white resize-none focus:outline-none focus:border-[#c9a84c]/50 placeholder-white/20"
+                placeholder="Add a note (optional)"
+                rows={2}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white resize-none focus:outline-none focus:border-[#c9a84c]/50 placeholder-white/20 mb-3"
               />
+
               <input
                 type="text"
                 value={photoForm.contributor_name}
                 onChange={e => setPhotoForm({ ...photoForm, contributor_name: e.target.value })}
                 placeholder="Your name (optional)"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white mt-3 focus:outline-none focus:border-[#c9a84c]/50 placeholder-white/20"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a84c]/50 placeholder-white/20"
               />
+
               <button
                 onClick={sendPhoto}
-                disabled={sending || !photoForm.venue_id || !photoForm.description.trim()}
+                disabled={sending || !photoForm.venue_id || !photoFile}
                 className="w-full mt-3 bg-[#c9a84c] text-[#0a0f0a] py-2.5 rounded-full font-semibold text-sm hover:bg-[#d4b65c] transition disabled:opacity-50"
               >
-                {sending ? 'Sending...' : 'Send'}
+                {sending ? 'Uploading...' : 'Send photo'}
               </button>
             </>
           )}
@@ -157,7 +220,7 @@ export default function FloatingButton() {
         <div className="bg-[#141e16] border border-white/10 rounded-2xl shadow-2xl overflow-hidden w-56">
           {actions.map(action => (
             action.href ? (
-              <a
+            <a  
                 key={action.id}
                 href={action.href}
                 target={action.external ? '_blank' : undefined}
