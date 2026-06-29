@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { supabase } from '../../lib/supabase'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import { isStale, daysAgo } from '../../lib/utils'
 
 export default async function VenuePage({ params }) {
   const { slug } = await params
@@ -62,12 +63,26 @@ export default async function VenuePage({ params }) {
           <h2 className="text-2xl font-black mt-2">Poncha prices</h2>
           {current?.length ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-              {current.map(c => (
-                <div key={c.poncha_type_id} className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
-                  <p className="text-white/40 text-sm">{c.poncha_types?.name || 'Poncha'}</p>
-                  <p className="text-3xl font-black text-[#c9a84c] mt-2">€{c.price_eur}</p>
-                </div>
-              ))}
+              {current.map(c => {
+                const stale = isStale(c.verified_at)
+                const days = daysAgo(c.verified_at)
+                return (
+                  <div key={c.poncha_type_id} className={'rounded-2xl p-6 ' + (stale ? 'bg-white/[0.02] border border-amber-500/20' : 'bg-white/[0.03] border border-white/[0.06]')}>
+                    <div className="flex justify-between items-start">
+                      <p className="text-white/40 text-sm">{c.poncha_types?.name || 'Poncha'}</p>
+                      {stale && (
+                        <span className="text-amber-400 text-xs font-semibold bg-amber-400/10 px-2 py-0.5 rounded-full">
+                          {days}d ago
+                        </span>
+                      )}
+                    </div>
+                    <p className={'text-3xl font-black mt-2 ' + (stale ? 'text-white/40' : 'text-[#c9a84c]')}>€{c.price_eur}</p>
+                    {stale && (
+                      <p className="text-amber-400/60 text-xs mt-2">This price may be outdated. Can you confirm it?</p>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           ) : (
             <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8 mt-6 text-white/30">
@@ -88,15 +103,21 @@ export default async function VenuePage({ params }) {
             <h2 className="text-xl font-black">Price history</h2>
             {history?.length ? (
               <div className="mt-4 space-y-3">
-                {history.map(h => (
-                  <div key={h.id} className="flex items-center justify-between border-b border-white/5 pb-3 last:border-0">
-                    <div>
-                      <p className="font-semibold text-[#c9a84c]">€{h.price_eur}</p>
-                      <p className="text-white/30 text-sm">{h.poncha_types?.name || 'Poncha'} · {h.observed_at}</p>
+                {history.map(h => {
+                  const stale = isStale(h.observed_at)
+                  return (
+                    <div key={h.id} className="flex items-center justify-between border-b border-white/5 pb-3 last:border-0">
+                      <div>
+                        <p className={'font-semibold ' + (stale ? 'text-white/40' : 'text-[#c9a84c]')}>€{h.price_eur}</p>
+                        <p className="text-white/30 text-sm">
+                          {h.poncha_types?.name || 'Poncha'} · {h.observed_at}
+                          {stale && <span className="text-amber-400/60 ml-2">· outdated</span>}
+                        </p>
+                      </div>
+                      <p className="text-white/20 text-sm">{h.contributor_name || 'Anonymous'}</p>
                     </div>
-                    <p className="text-white/20 text-sm">{h.contributor_name || 'Anonymous'}</p>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             ) : (
               <p className="text-white/30 mt-4">No history yet.</p>
@@ -106,7 +127,7 @@ export default async function VenuePage({ params }) {
         </div>
 
         <div className="mt-14 border border-white/10 rounded-2xl p-10 text-center">
-          <h2 className="text-2xl font-black">Know the updated price of this venue?</h2>
+          <h2 className="text-2xl font-black">Know the updated price for this venue?</h2>
           <p className="text-white/40 mt-2">Help keep the index accurate.</p>
           <a href="/submit" className="inline-block mt-6 bg-[#c9a84c] text-[#0a0f0a] px-8 py-3 rounded-full font-bold hover:bg-[#d4b65c] transition">Add a price for {venue.name}</a>
         </div>
