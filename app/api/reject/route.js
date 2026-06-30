@@ -12,9 +12,7 @@ export async function POST(request) {
 
   if (authError || !user) {
     return NextResponse.json({ error: 'Not authorized' }, { status: 401 })
-  }
-
-  const sub = await request.json()
+  } const sub = await request.json()
 
   const { error } = await supabaseAdmin
     .from('price_submissions')

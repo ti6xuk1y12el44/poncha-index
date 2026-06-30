@@ -2,7 +2,6 @@ import { supabaseAdmin } from '../../lib/supabaseAdmin'
 import { NextResponse } from 'next/server'
 
 export async function POST(request) {
-  // Verifica que quem chama está autenticado
   const authHeader = request.headers.get('authorization')
   if (!authHeader) {
     return NextResponse.json({ error: 'Not authorized' }, { status: 401 })
@@ -15,20 +14,16 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Not authorized' }, { status: 401 })
   }
 
-  // Lê os dados enviados pelo browser
   const sub = await request.json()
 
-  // Marca a submissão como aprovada
   const { error: updateError } = await supabaseAdmin
-    .from('price_submissions')
-    .update({ moderation_status: 'approved' })
+    .from('price_submissions') .update({ moderation_status: 'approved' })
     .eq('id', sub.id)
 
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
-  // Atualiza o preço atual
   const { error: upsertError } = await supabaseAdmin
     .from('price_current')
     .upsert({
@@ -40,8 +35,7 @@ export async function POST(request) {
     })
 
   if (upsertError) {
-    return NextResponse.json({ error: upsertError.message }, { status: 500 })
-  }
+    return NextResponse.json({ error: upsertError.message }, { status: 500 })  }
 
   return NextResponse.json({ success: true })
 }
